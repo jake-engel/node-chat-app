@@ -24,11 +24,33 @@ function scrollToBottom() {
 }
 
 socket.on('connect', function() {
-  console.log('Connected to server!');
+  const urlParamString = window.location.search.substring(1);
+  const urlParamObj = JSON.parse('{"' + decodeURI(urlParamString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"').replace("+", " ") + '"}');
+
+  socket.emit('join', urlParamObj, function(err) {
+    if (err) {
+      alert(err);
+      window.location.href = '/';
+    } else {
+      console.log('No error');
+    }
+  });
 });
 
 socket.on('disconnect', function() {
   console.log('Disconnected from server');
+});
+
+socket.on('updateUserList', function(users) {
+  const userList = document.getElementById('users');
+  userList.appendChild(document.createElement('ol'));
+  const ol = document.querySelector('#users ol');
+
+  users.forEach(function(user) {
+    li = document.createElement("li");
+    li.innerHTML = user;
+    ol.appendChild(li);
+  });
 });
 
 socket.on('newMessage', function(message) {
@@ -58,6 +80,7 @@ socket.on('newLocationMessage', function(message) {
 
 const userText = document.querySelector('#message-form input');
 const submit = document.querySelector('button');
+submit.setAttribute('disabled', 'disabled');
 
 submit.addEventListener('click', function(event) {
   event.preventDefault();
@@ -97,5 +120,14 @@ locationButton.addEventListener('click', function() {
   });
 });
 
+const inputMessageBar = document.querySelector('form input[name="message"]')
+
+inputMessageBar.addEventListener('keydown', function(event) {
+  const realInputVal = inputMessageBar.value.trim() + event.key.trim();
+  submit.removeAttribute('disabled');
+  if (realInputVal.length === 0 || realInputVal.endsWith('Backspace')) {
+    submit.setAttribute('disabled', 'disabled');
+  }
+});
 
 
