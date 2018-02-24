@@ -9,5 +9,22 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(message) {
-  console.log('newMessage: ', message);
-})
+  const messages = document.getElementById('messages');
+  const newMessage = document.createElement("li");
+  newMessage.appendChild(document.createTextNode(`${message.from}: ${message.text}`));
+  messages.appendChild(newMessage);
+});
+
+const userText = document.querySelector('#message-form input');
+const submit = document.querySelector('button');
+
+submit.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  socket.emit('createMessage', {
+    from: 'User',
+    text: userText.value
+  }, function() {
+
+  });
+});
