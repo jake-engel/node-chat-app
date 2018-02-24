@@ -9,19 +9,26 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(message) {
-  const messages = document.getElementById('messages');
+  const template = document.getElementById('message-template').innerHTML;
   const formattedTime = moment(message.createdAt).format('h:mm a');
-  const newMessage = document.createElement("li");
-  newMessage.appendChild(document.createTextNode(`${message.from} ${formattedTime}: ${message.text}`));
-  messages.appendChild(newMessage);
+  const html = Mustache.render(template, {
+    text: message.text,
+    from: message.from,
+    createdAt: formattedTime
+  });
+
+  document.getElementById('messages').innerHTML += html;
 });
 
 socket.on('newLocationMessage', function(message) {
-  const messages = document.getElementById('messages');
+  const template = document.getElementById('location-message-template').innerHTML;
   const formattedTime = moment(message.createdAt).format('h:mm a');
-  const newMessage = document.createElement("li");
-  newMessage.innerHTML = `${message.from} ${formattedTime}: <a href="${message.url}" target="_blank"> Current Location</a>`;
-  messages.appendChild(newMessage);
+  const html = Mustache.render(template, {
+    from: message.from,
+    url: message.url
+  });
+
+  document.getElementById('messages').innerHTML += html;
 });
 
 const userText = document.querySelector('#message-form input');
@@ -30,7 +37,7 @@ const submit = document.querySelector('button');
 submit.addEventListener('click', function(event) {
   event.preventDefault();
 
-  if (userText.value) {
+  if (userText.value.trim()) {
     socket.emit('createMessage', {
       from: 'User',
       text: userText.value
