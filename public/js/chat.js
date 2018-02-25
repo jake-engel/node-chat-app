@@ -43,6 +43,7 @@ socket.on('disconnect', function() {
 
 socket.on('updateUserList', function(users) {
   const userList = document.getElementById('users');
+  userList.innerHTML = '';
   userList.appendChild(document.createElement('ol'));
   const ol = document.querySelector('#users ol');
 
@@ -84,10 +85,12 @@ submit.setAttribute('disabled', 'disabled');
 
 submit.addEventListener('click', function(event) {
   event.preventDefault();
+  const urlParamString = window.location.search.substring(1);
+  const urlParamObj = JSON.parse('{"' + decodeURI(urlParamString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"').replace("+", " ") + '"}');
 
   if (userText.value.trim()) {
     socket.emit('createMessage', {
-      from: 'User',
+      from: urlParamObj.name,
       text: userText.value
     }
     , function() {
