@@ -8,9 +8,10 @@ const generateMessage = (from, text) => {
   };
 };
 
-const generateLocationMessage = (from, lat, lng) => {
+const generateLocationMessage = (from, about, lat, lng) => {
   return {
     from,
+    about,
     url: `https://www.google.com/maps?q=${lat},${lng}`,
     createdAt: moment().valueOf()
   }

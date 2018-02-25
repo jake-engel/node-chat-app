@@ -71,6 +71,7 @@ socket.on('newLocationMessage', function(message) {
   const template = document.getElementById('location-message-template').innerHTML;
   const formattedTime = moment(message.createdAt).format('h:mm a');
   const html = Mustache.render(template, {
+    about: message.about,
     from: message.from,
     url: message.url
   });
@@ -85,12 +86,9 @@ submit.setAttribute('disabled', 'disabled');
 
 submit.addEventListener('click', function(event) {
   event.preventDefault();
-  const urlParamString = window.location.search.substring(1);
-  const urlParamObj = JSON.parse('{"' + decodeURI(urlParamString).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"').replace("+", " ") + '"}');
 
   if (userText.value.trim()) {
     socket.emit('createMessage', {
-      from: urlParamObj.name,
       text: userText.value
     }
     , function() {
